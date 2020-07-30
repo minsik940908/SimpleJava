@@ -1,0 +1,35 @@
+-- 1) COMMIT (확정 및 적용)
+-- AUTOCOMMIT 여부 확인 
+SHOW AUTOCOMMIT;  
+-- AUTOCOMMIT 실행(비추!!)
+SET AUTOCOMMIT ON; 
+-- AUTOCOMMIT 끄기
+SET AUTOCOMMIT OFF; 
+
+-- 2) ROLLBACK (되돌리기) : INSERT, UPDATE, DELETE 문만 가능 하다.
+--커밋으로 현재 상태 저장
+COMMIT;
+SELECT * FROM emplyees; 
+DELETE FROM emplyees;
+ROLLBACK;
+
+
+-- 3) SAVE POINT
+-- ROLLBACK 은 최종 COMMIT 지점으로 돌아간다.
+-- SAVE POINT 를 활용하면 주요 부분으로 돌아 갈 수 있다.
+SELECT * FROM emplyees;
+--- 111부터 113 까지 삭제
+DELETE FROM emplyees WHERE emp_no = '111' OR emp_no = '112' OR emp_no = '113';
+DELETE FROM emplyees WHERE emp_no IN ('111', '112', '113');
+DELETE FROM emplyees WHERE emp_no BETWEEN 111 AND 113;
+SAVEPOINT pointA; -- 삭제 후 시점 저장
+
+-- 114부터 116까지
+DELETE FROM emplyees WHERE emp_no BETWEEN 114 AND 116;
+SAVEPOINT pointB; --삭제 후 시점 저장
+
+-- 4) ROLLBACK TO
+ROLLBACK TO pointA;
+SELECT * FROM emplyees;
+ROLLBACK TO pointB; -- 해당 포인트 이후에 실행한 쿼리가 없으므로 롤백이 불가
+SELECT * FROM emplyees;

@@ -1,0 +1,106 @@
+-- 1.데이터 조회
+-- 1) 특정 컬럼 조회
+-- SELECT [보고싶은 컬럼] FROM [테이블 명];
+SELECT * FROM emplyees;
+
+-- first_name,  family_name, salary
+SELECT  family_name, first_name, salary FROM emplyees;
+
+-- 산술 표현 : 숫자로 된 컬럼은 산술 표현이 가능하다.
+SELECT family_name, first_name, salary / 10000 FROM emplyees;
+-- AS 를 통해 컬럼 별칭을 줄 수 있다.
+SELECT family_name, first_name, (salary * 12) AS 연봉 FROM emplyees;
+-- ||''||로 문자를 합칠 수 있다.
+SELECT family_name||''|| first_name AS 이름, (salary * 12) AS 연봉 FROM emplyees;
+SELECT family_name||''|| first_name AS 이름, salary/10000 || '만원' AS 월급 FROM emplyees;
+
+-- 2) 특정 조건을 만족하는 데이터 조회
+-- SELECT [보고싶은 컬럼] FROM [테이블 명] WHERE [조건];
+-- family_name = '김' 인 사람
+-- salary 가 3000000 보다 큰 사람
+SELECT emp_no, family_name||''|| first_name AS 이름, salary/10000 || '만원' AS 월급 FROM emplyees WHERE salary > 3000000;
+SELECT emp_no, family_name||''|| first_name AS 이름 FROM emplyees WHERE family_name = '김' ;
+
+-- 3) AND 조건
+SELECT emp_no, family_name||''|| first_name AS 이름 FROM emplyees WHERE salary<5000000 AND salary > 2000000 ;
+SELECT emp_no, family_name||''|| first_name AS 이름, salary AS 월급 FROM emplyees WHERE salary<=5000000  AND family_name = '고';
+
+-- 4) OR 조건
+-- family_name = '김' 이거나 salary 가 5000000 이상인 사람
+SELECT emp_no, family_name||''|| first_name AS 이름, salary AS 월급 
+    FROM emplyees WHERE salary>5000000  OR family_name = '박';
+
+-- BETWEEN AND
+-- WHERE salary > 4000000 AND salary > 6000000
+-- WHERE salary BETWEEN 4000000 AND 6000000 (이상 이하)
+SELECT emp_no, first_name, family_name, salary FROM emplyees
+    WHERE salary BETWEEN 4000000 AND 6000000;
+
+-- 6) 중복제거 
+-- SELECT DISTINCT [중복제거할 컬럼] FROM [테이블];
+SELECT DISTINCT salary FROM emplyees;
+
+-- 7) IN : OR 조건을 여러개 넣을 경우
+-- family_name 이 '김' 이거나 '이' 이거나 '박' 인 데이터를 불러와라
+SELECT * FROM emplyees WHERE family_name = '김' OR family_name = '이' OR family_name = '박';
+-- OR 조건이 많으면 IN이 속도면에서 유리하다(빠르다).
+SELECT * FROM emplyees WHERE family_name IN( '김', '이', '박');
+
+-- 8) IS NULL / IS NOT NULL
+SELECT * FROM emplyees WHERE commission IS NULL;
+SELECT * FROM emplyees WHERE commission IS NOT NULL;
+
+-- 9) LIKE : 일부가 비슷한 내용을 검색(속도에 영향을 줄 수 있다. 남용 하면 안된다.)
+-- WHERE [column] LIKE '[%를 포함한 문자열]'
+-- 앞자리 ze로 시작하는... -> ze%
+--  com으로 끝나는.. -> %com
+-- s와 e가 포함되는 -> %s%e% (속도가 제일 느리다.)
+
+SELECT * FROM emplyees WHERE email LIKE 'al%';
+SELECT * FROM emplyees WHERE email LIKE '%com';
+SELECT * FROM emplyees WHERE email LIKE '%m%i%';
+
+-- 10) ORDER BY : 정렬
+-- ASC : 오름차순, DESC : 내림차순
+-- SELECT * FROM [table] ORDER BY [정렬할 기준 컬럼] [ASC(생략 가능) | DESC];
+-- ORDER BY 는 가장 뒤에
+-- default : 오름차순
+
+-- salary 내림 차순
+SELECT * FROM emplyees ORDER BY salary DESC;
+-- family_name 오름차순
+SELECT * FROM emplyees ORDER BY family_name ASC;
+
+-- 11) GROUP BY
+-- 데이터를 그루핑 해서 결과를 가져오는 경우
+-- SELECT [컬럼, 계산된 컬럼] FROM [테이블] GROUP BY [그룹핑 할 컬럼]
+-- 부서별 월급 총합
+SELECT depart_no AS 부서, SUM(salary) AS 급여합계 FROM emplyees GROUP BY depart_no;
+
+SELECT depart_no AS 부서, SUM(commission) AS 인센합계 FROM emplyees GROUP BY depart_no;
+-- 그룹별 인센티브 합계(실패)
+-- salary는 그룹화 대상도 아니고 합계된 대상도 아니므로... (혼자 데이터가 여러개)
+-- 해결 방법 : salary 를 빼던지, salary 합계를 구하던지
+SELECT depart_no AS 부서, AVG(salary) AS 급여평균, AVG(commission) AS 인센평균 FROM emplyees GROUP BY depart_no;
+
+-- 12) GROUP BY 의 조건 HAVING
+-- GROUP BY 에서 사용한 결과로 부터 조건을 특정한 내용만 뽑아낼 경우
+-- 급여 합계가 500만원 이상인 부서는?
+SELECT depart_no AS 부서, SUM(salary) AS 급여합계 FROM emplyees GROUP BY depart_no HAVING SUM(salary)  > 5000000;
+
+-- 급여 합계가 500만원 이상인 부서를 급여 합계가 높은 순으로 출력
+-- HAVING 절에서는 별칭을 사용 할 수 없다.
+SELECT depart_no AS 부서, SUM(salary) AS 급여합계 FROM emplyees GROUP BY depart_no HAVING SUM(salary)  > 5000000 ORDER BY 급여합계 DESC;
+
+
+
+
+
+
+
+
+
+
+
+
+
